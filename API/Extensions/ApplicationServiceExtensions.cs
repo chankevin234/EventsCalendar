@@ -21,11 +21,12 @@ namespace API.Extensions
 
             //add the new db's context and connection
             // NO LONGER NEEDED IF USING FLYIO SECRETS
-                // services.AddDbContext<DataContext>(opt =>
-                //     {
-                //         // opt.UseSqlite(config.GetConnectionString("DefaultConnection")); //OLD SQLITE connection
-                //         opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
-                //     }); //this uses the connection string
+            // services.AddDbContext<DataContext>(opt =>
+            //     {
+            //         // opt.UseSqlite(config.GetConnectionString("DefaultConnection")); //OLD SQLITE connection
+            //         opt.UseNpgsql(config.GetConnectionString("DefaultConnection"));
+            //     }); //this uses the connection string
+
             services.AddDbContext<DataContext>(options =>
                 {
                     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
