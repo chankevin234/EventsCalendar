@@ -27,10 +27,33 @@ var app = builder.Build(); //builds the app
 MIDDLEWARE is assembled into an app pipeline to handle requests and response (decides if it will pass request to next component in pipeline) */
 app.UseMiddleware<ExceptionMiddleware>();
 
+// Security policy middleware (content header)
+app.UseXContentTypeOptions();
+app.UseReferrerPolicy(opt => opt.NoReferrer());
+app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
+app.UseXfo(opt => opt.Deny());
+app.UseCsp(opt => opt
+    .BlockAllMixedContent()
+    .StyleSources(s => s.Self().CustomSources("https://fonts.googleapis.com"))
+    .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com", "data:"))
+    .FormActions(s => s.Self())
+    .FrameAncestors(s => s.Self())
+    .ImageSources(s => s.Self().CustomSources("blob:", "https://res.cloudinary.com"))
+    .ScriptSources(s => s.Self())
+);
+
 if (app.Environment.IsDevelopment()) //applies middleware (controls api traffic in/out)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.Use(async (context, next) => 
+    {
+        context.Response.Headers.Add("Strict-Transport-Security", "max-age=31535000");
+        await next.Invoke();
+    });
 }
 
 app.UseCors("CorsPolicy"); // adds CORS middleware HEADER to allow cross domain requests 
